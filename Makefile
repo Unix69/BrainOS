@@ -25,22 +25,35 @@
 
 SRCS = $(wildcard *.c)
 OBJS = $(SRCS:.c=.o)
+
+ASMSRCS = $(wildcard *.S)
+ASMOBJS = $(ASMSRCS:.S=.o)
+
+
 CFLAGS = -Wall -O2 -ffreestanding -nostdinc -nostdlib -nostartfiles
+CC = aarch64-linux-gnu-gcc
+LD = aarch64-linux-gnu-ld
+OBJCPY = aarch64-linux-gnu-objcopy
+RUN = qemu-system-aarch64
+TARGET = kernel8.img
+LINKMAP = link.ld
+KERNEL = kernel.elf
 
-all: clean kernel8.img
+all: clean $(TARGET)
 
-start.o: start.S
-	aarch64-linux-gnu-gcc $(CFLAGS) -c start.S -o start.o
 
+%.o: %.S
+	$(CC) $(CFLAGS) -c  $< -o $@
+	
 %.o: %.c
-	aarch64-linux-gnu-gcc $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
-kernel8.img: start.o $(OBJS)
-	aarch64-linux-gnu-ld -nostdlib -nostartfiles start.o $(OBJS) -T link.ld -o kernel8.elf
-	aarch64-linux-gnu-objcopy -O binary kernel8.elf kernel8.img
+$(TARGET): $(ASMOBJS) $(OBJS)
+	$(LD) -nostdlib -nostartfiles $(ASMOBJS) $(OBJS) -T $(LINKMAP) -o $(KERNEL)
+	$(OBJCPY) -O binary $(KERNEL) $(TARGET)
 
 clean:
-	rm kernel8.elf *.o >/dev/null 2>/dev/null || true
+	rm $(KERNEL) *.o >/dev/null 2>/dev/null || true
 
 run:
-	sudo qemu-system-aarch64 -M virt -machine type=raspi3,accel=tcg,kernel_irqchip=on -cpu cortex-a53 -smp 4 -kernel kernel8.img -serial stdio
+	sudo $(RUN) -M virt -machine type=raspi3,accel=tcg,kernel_irqchip=on -cpu cortex-a53 -smp 4 -kernel $(TARGET) -serial stdio

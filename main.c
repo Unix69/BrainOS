@@ -33,7 +33,6 @@
 
 
 void exception_handler(unsigned long type, unsigned long esr, unsigned long elr, unsigned long spsr, unsigned long far, unsigned long currel);
-void boot(uint64_t bootmode);
 void print_uint64(uint64_t reg);
 void print_uint32(uint32_t reg);
 void delay_test();
