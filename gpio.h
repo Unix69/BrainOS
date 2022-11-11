@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 bzt (bztsrc@github)
+ * Copyright (C) 2022 (Unix69@github)
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -23,7 +23,12 @@
  *
  */
 
-#define MMIO_BASE       0x3F000000
+
+#ifndef GPIO_H
+#define GPIO_H
+
+
+#include "mmu.h"
 
 #define GPFSEL0         ((volatile unsigned int*)(MMIO_BASE+0x00200000))
 #define GPFSEL1         ((volatile unsigned int*)(MMIO_BASE+0x00200004))
@@ -43,3 +48,6 @@
 #define GPPUD           ((volatile unsigned int*)(MMIO_BASE+0x00200094))
 #define GPPUDCLK0       ((volatile unsigned int*)(MMIO_BASE+0x00200098))
 #define GPPUDCLK1       ((volatile unsigned int*)(MMIO_BASE+0x0020009C))
+
+
+#endif

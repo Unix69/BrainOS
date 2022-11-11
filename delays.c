@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 bzt (bztsrc@github)
+ * Copyright (C) 2022 (Unix69@github)
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -23,10 +23,8 @@
  *
  */
 
-#include "gpio.h"
 
-#define SYSTMR_LO        ((volatile unsigned int*)(MMIO_BASE+0x00003004))
-#define SYSTMR_HI        ((volatile unsigned int*)(MMIO_BASE+0x00003008))
+#include "delays.h"
 
 /**
  * Wait N CPU cycles (ARM CPU only)

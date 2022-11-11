@@ -1,9 +1,34 @@
+/*
+ * Copyright (C) 2022 (Unix69@github)
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use, copy,
+ * modify, merge, publish, distribute, sublicense, and/or sell copies
+ * of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ *
+ */
 
 
 
 
 
-
+.arch armv8-a
+.file "hv.S"
 
 .section ".text.hv"
 
@@ -20,6 +45,11 @@ UNITIDHEADER:		.asciz "Unit/Multiproc "
 TIDEL2HEADER:		.asciz "Software thread Register EL2 "
 SPSREL2HEADER:		.asciz "Saved Program Status Register EL2 "
 ELREL2HEADER:		.asciz "Excpetion Link Register EL2 "
+CTFEL0HEADER:		.asciz "Counter Time Frequency Register EL0 "
+CTCVEL0HEADER:		.asciz "Counter Count Value Register EL0 "
+CHPTEL2HEADER:		.asciz "Hypervisor Physical Timer Control register "
+CHPTTVEL2HEADER:	.asciz "Hypervisor Physical Timer Time Value register "
+CHPTCVEL2HEADER:	.asciz "Hypervisor Physical Timer Compare Value register "
 SPEL1HEADER:		.asciz "Stack Pointer EL1 "
 SPEL2HEADER:		.asciz "Stack Pointer EL2 "
 SPEL3HEADER:		.asciz "Stack Pointer EL3 "
@@ -32,6 +62,8 @@ DAIFHEADER:			.asciz "DAIF flag "
 NL:					.asciz "\n"
 CR:					.asciz "\r"
 TB:					.asciz "\t"
+
+.equ TIMER_IRQ_CTRL, 0x40000040
 
 .text
 
@@ -61,12 +93,13 @@ hv_boot:
 	MOV X0, x20
 	BL uart_hex_uint64
 
+	
+
 	//print newline
 	MOV X0, #0 
 	LDR X0, =NL
 	BL uart_puts
 
-	
 	
 	//print CURRENTEL	
 	MOV X0, #0 
@@ -302,13 +335,6 @@ hv_boot:
 	MRS X0, SCTLR_EL2
 	BL uart_hex_uint64
 	
-	//print newline
-	MOV X0, #0 
-	LDR X0, =NL
-	BL uart_puts
-
-	MRS X0, DACR32_EL2
-	BL uart_hex_uint64
 
 	//print newline
 	MOV X0, #0 
@@ -338,52 +364,6 @@ hv_boot:
 	MOV X0, #0 
 	LDR X0, =NL
 	BL uart_puts
-
-	MRS X0, FPCR
-	BL uart_hex_uint64
-
-	//print newline
-	MOV X0, #0 
-	LDR X0, =NL
-	BL uart_puts
-
-	
-	MRS X0, FPEXC32_EL2
-	BL uart_hex_uint64
-
-	//print newline
-	MOV X0, #0 
-	LDR X0, =NL
-	BL uart_puts
-
-	MRS X0, FPSR
-	BL uart_hex_uint64
-
-	//print newline
-	MOV X0, #0 
-	LDR X0, =NL
-	BL uart_puts
-
-	MRS X0, HSTR_EL2
-	BL uart_hex_uint64
-
-	//print newline
-	MOV X0, #0 
-	LDR X0, =NL
-	BL uart_puts
-
-	//MRS X0, IC IALLU
-	BL uart_hex_uint64
-
-	//print newline
-	MOV X0, #0 
-	LDR X0, =NL
-	BL uart_puts
-
-
-
-	
-
 
 
 
@@ -424,9 +404,148 @@ hv_boot:
 	BL uart_hex_uint64
 	
 	//print newline
+	MOV X0, #0 
+	LDR X0, =NL
+	BL uart_puts
+
+
+
+
+timer_boot:
+
+
+
+	//print system counter frequency 	
+	MOV X0, #0 
+	LDR X0, =CTFEL0HEADER
+	BL uart_puts
+	MOV X0, #0
+	MRS X0, CNTFRQ_EL0
+	BL uart_hex_uint64
+
+	//print newline
+	MOV X0, #0 
+	LDR X0, =NL
+	BL uart_puts
+
+	//print CNTPCT_EL0 register
+	MOV X0, #0 
+	LDR X0, =CTCVEL0HEADER
+	BL uart_puts
+	MOV X0, #0
+	MRS X0, CNTPCT_EL0
+	BL uart_hex_uint64
+
+	//print newline
+	MOV X0, #0 
+	LDR X0, =NL
+	BL uart_puts
+
+	//print CNTHP_TVAL_EL2 register	
+	MOV X0, #0 
+	LDR X0, =CHPTTVEL2HEADER
+	BL uart_puts
+	MOV X0, #0
+	MRS X0, CNTHP_TVAL_EL2
+	BL uart_hex_uint64
+
+	//print newline
+	MOV X0, #0 
+	LDR X0, =NL
+	BL uart_puts
+
+	//print CNTHP_TVAL_EL2 register	
+	MOV X0, #0 
+	LDR X0, =CHPTCVEL2HEADER
+	BL uart_puts
+	MOV X0, #0
+	MRS X0, CNTHP_CVAL_EL2
+	BL uart_hex_uint64
+
+	//print newline
+	MOV X0, #0 
+	LDR X0, =NL
+	BL uart_puts
+
+	//print system CNTHP_CTL_EL2 register	
+	MOV X0, #0
+	LDR X0, =CHPTEL2HEADER
+	BL uart_puts
+	MOV X0, #0
+	MRS X0, CNTHP_CTL_EL2
+	BL uart_hex_uint64
+
+	//print newline
+	MOV X0, #0 
+	LDR X0, =NL
+	BL uart_puts
+
+	//Set CNTP_TVAL_EL0 (CNTP_CVAL_EL0 = CNTPCT_EL0 + CNTP_TVAL_EL0)  
+	MOV X0, #1000
+	LSL X0, X0, #63
+	MSR CNTP_TVAL_EL0, X0
+
+	//Set CNTHP_CTL_EL2.ENABLE bit 
+	MOV X0, #1
+	MSR CNTP_CTL_EL0, X0
+
+	//print system CNTHP_CTL_EL2 register	
+	MOV X0, #0
+	LDR X0, =CHPTEL2HEADER
+	BL uart_puts
+	MOV X0, #0
+	MRS X0, CNTP_CTL_EL0
+	BL uart_hex_uint64
+
+
+	//print newline
+	MOV X0, #0 
+	LDR X0, =NL
+	BL uart_puts
+
+	//print CNTPCT_EL0 register
+	MOV X0, #0 
+	LDR X0, =CTCVEL0HEADER
+	BL uart_puts
+	MOV X0, #0
+	MRS X0, CNTPCT_EL0
+	BL uart_hex_uint64
+
+	//print newline
+	MOV X0, #0 
+	LDR X0, =NL
+	BL uart_puts
+
+	//print CNTHP_TVAL_EL2 register	
+	MOV X0, #0 
+	LDR X0, =CHPTTVEL2HEADER
+	BL uart_puts
+	MOV X0, #0
+	MRS X0, CNTHP_TVAL_EL2
+	BL uart_hex_uint64
+
+	//print newline
+	MOV X0, #0 
+	LDR X0, =NL
+	BL uart_puts
+
+	//print CNTHP_TVAL_EL2 register	
+	MOV X0, #0 
+	LDR X0, =CHPTCVEL2HEADER
+	BL uart_puts
+	MOV X0, #0
+	MRS X0, CNTHP_CVAL_EL2
+	BL uart_hex_uint64
+
+
+	//print newline
 	MOV X0, #0
 	LDR X0, =NL
 	BL uart_puts
+
+	MOV X0, #4
+	LDR X1, =TIMER_IRQ_CTRL
+  	STR X0, [X1] // enable timer interrupt
 
 
 	LDP X29, X30, [SP], #16

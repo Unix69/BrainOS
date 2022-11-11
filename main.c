@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 bzt (bztsrc@github)
+ * Copyright (C) 2022 (Unix69@github)
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -13,7 +13,7 @@
  * included in all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES O
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
  * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
@@ -22,6 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 
 #include "uart.h"
 #include "delays.h"
@@ -178,7 +179,6 @@ void main()
 	uart_puts("\n\n\n--------------------------------------------------\n");
 	uart_puts("                Bootstap Brain OS               -\n");
 	uart_puts("--------------------------------------------------\n");
-	//boot(BOOTMODE);
 	
 	while(1){
 		char uart_input;

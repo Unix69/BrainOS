@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 bzt (Unix69@github)
+ * Copyright (C) 2022 (Unix69@github)
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -9,7 +9,7 @@
  * of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall BE
+ * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
@@ -22,6 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
+
 
 
 .arch armv8-a
@@ -226,6 +227,3 @@ run_el1:
 	BL main
     
 	Bl wait_for_exc
-
-
-

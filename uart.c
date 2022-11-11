@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 bzt (bztsrc@github)
+ * Copyright (C) 2022 (Unix69@github)
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -23,23 +23,22 @@
  *
  */
 
+
+
+
 #include "gpio.h"
 #include "mbox.h"
 #include "delays.h"
+#include "uart.h"
+#include "types.h"
 
-/* PL011 UART registers */
-#define UART0_DR        ((volatile unsigned int*)(MMIO_BASE+0x00201000))
-#define UART0_FR        ((volatile unsigned int*)(MMIO_BASE+0x00201018))
-#define UART0_IBRD      ((volatile unsigned int*)(MMIO_BASE+0x00201024))
-#define UART0_FBRD      ((volatile unsigned int*)(MMIO_BASE+0x00201028))
-#define UART0_LCRH      ((volatile unsigned int*)(MMIO_BASE+0x0020102C))
-#define UART0_CR        ((volatile unsigned int*)(MMIO_BASE+0x00201030))
-#define UART0_IMSC      ((volatile unsigned int*)(MMIO_BASE+0x00201038))
-#define UART0_ICR       ((volatile unsigned int*)(MMIO_BASE+0x00201044))
+
+
 
 /**
  * Set baud rate and characteristics (115200 8N1) and map to GPIO
  */
+
 void uart_init()
 {
     	register unsigned int r;
@@ -80,7 +79,7 @@ void uart_init()
 /**
  * Send a character
  */
-void uart_send(unsigned int c) {
+void uart_send(uint8_t c) {
     /* wait until we can send */
     do{asm volatile("nop");}while(*UART0_FR&0x20);
     /* write the character to the buffer */
@@ -116,8 +115,8 @@ void uart_puts(char *s) {
 /**
  * Display a binary value in hexadecimal
  */
-void uart_hex_uint32(unsigned int d) {
-	unsigned int n;
+void uart_hex_uint32(uint32_t d) {
+	uint8_t n;
     	int c;
     	for(c=28;c>=0;c-=4) {
         	// get highest tetrad
@@ -130,7 +129,7 @@ void uart_hex_uint32(unsigned int d) {
 }
 
 
-void uart_hex_uint64(unsigned long long d) {
+void uart_hex_uint64(uint64_t d) {
     	unsigned int n;
     	int c;
     	for(c=60;c>=0;c-=4) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 bzt (bztsrc@github)
+ * Copyright (C) 2022 (Unix69@github)
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -23,20 +23,32 @@
  *
  */
 
-typedef unsigned long int uint32_t;
-typedef unsigned long long int uint64_t;
-typedef unsigned short int uint16_t;
-typedef unsigned char uint8_t;
 
-typedef signed long int int32_t;
-typedef signed long long int int64_t;
-typedef signed short int int16_t;
-typedef signed char int8_t;
+
+
+#ifndef UART_H
+#define UART_H
+
+#include "types.h"
+#include "mmu.h"
+
+
+/* PL011 UART registers */
+#define UART0_DR        ((volatile unsigned int*)(MMIO_BASE+0x00201000))
+#define UART0_FR        ((volatile unsigned int*)(MMIO_BASE+0x00201018))
+#define UART0_IBRD      ((volatile unsigned int*)(MMIO_BASE+0x00201024))
+#define UART0_FBRD      ((volatile unsigned int*)(MMIO_BASE+0x00201028))
+#define UART0_LCRH      ((volatile unsigned int*)(MMIO_BASE+0x0020102C))
+#define UART0_CR        ((volatile unsigned int*)(MMIO_BASE+0x00201030))
+#define UART0_IMSC      ((volatile unsigned int*)(MMIO_BASE+0x00201038))
+#define UART0_ICR       ((volatile unsigned int*)(MMIO_BASE+0x00201044))
 
 
 void uart_init();
-void uart_send(unsigned int c);
+void uart_send(uint8_t c);
 char uart_getc();
 void uart_puts(char *s);
-void uart_hex_uint32(unsigned int d);
-void uart_hex_uint64(unsigned long long d);
+void uart_hex_uint32(uint32_t d);
+void uart_hex_uint64(uint64_t d);
+
+#endif
