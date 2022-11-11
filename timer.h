@@ -65,6 +65,10 @@
 void sys_timer_boot();
 void sys_timer_init();
 
+uint32_t sys_timer_enable(uint8_t sys_timer);
+uint32_t sys_timer_disable(uint8_t sys_timer);
+
+
 //set and get system timer control/status
 void sys_timer_stat_set(uint8_t sys_timer, uint32_t sys_timer_status);
 void sys_timer_stat_clear(uint8_t sys_timer);
