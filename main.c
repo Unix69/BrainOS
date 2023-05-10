@@ -26,12 +26,11 @@
 
 #include "uart.h"
 #include "delays.h"
+#include "system_timer.h"
+#include "timer.h"
+
 
 #define BOOTMODE 64
-
-
-
-
 
 void exception_handler(unsigned long type, unsigned long esr, unsigned long elr, unsigned long spsr, unsigned long far, unsigned long currel);
 void print_uint64(uint64_t reg);
@@ -173,12 +172,49 @@ char OS_NAME [] = "BrainOS";
 char OS_LEVEL [] = "Root";
 char DIRECTORY [] = "/Home/Desktop";
 
+#define ROOT_ID 0
+
 void main()
 {
-                                 
-	uart_puts("\n\n\n--------------------------------------------------\n");
-	uart_puts("                Bootstap Brain OS               -\n");
-	uart_puts("--------------------------------------------------\n");
+	register uint8_t sys_timer_0 = SYSTEM_TIMER_0;
+    register uint8_t sys_timer_1 = SYSTEM_TIMER_1;
+    register uint8_t sys_timer_2 = SYSTEM_TIMER_2;
+    register uint8_t sys_timer_3 = SYSTEM_TIMER_3;
+    register uint32_t i;
+    register uint8_t st_owner = ROOT_ID;
+    register uint32_t st_comparer[N_TIMERS];
+	register uint8_t n_timers = N_TIMERS;
+    register uint32_t t_load = 1024;
+	register uint8_t n_stimer = N_STIMERS;
+		
+    uart_init();
+	uart_puts("\n\n\n------------------------------------------------------------------\n");
+	uart_puts("                          Bootstap Brain OS                            -\n");
+	uart_puts("------------------------------------------------------------------------\n");
+
+	// Timer initialization function: MUST BE CALLED BEFORE EVERY OPERATION
+	timer_boot();
+    sys_timer_boot();
+
+	//Acquire timer
+    timer_acquire(t_owner, NULL, NULL, NULL);
+	//Acquire system timers
+	for (i = 0; i < n_stimer; i++)
+    {
+        sys_timer_acquire(i, st_owner, NULL, NULL, NULL, NULL);
+        st_comparer[i] = 1024 * (i + 1)
+    }
+
+
+	timer_start(t_owner, t_load, T_INTERRUPT_EN, 0, T_NOPRESCALE, T_BITS_HIGH, T_FREE_RUN_EN);
+    for (i = 0; i < N_TIMERS; i++)
+    {
+        sys_timer_start(i, st_owner, st_comparer[i]);
+    }
+	
+	uart_puts("\n\n\n------------------------------------------------------------------\n");
+	uart_puts("                Bootstap Brain OS Successfully Completed                \n");
+	uart_puts("------------------------------------------------------------------------\n");
 	
 	while(1){
 		char uart_input;
@@ -194,8 +230,6 @@ void main()
 			uart_send(((unsigned int)uart_input) - 32);
 		}
 
-		
-		
 		uart_puts("\n");
 
 

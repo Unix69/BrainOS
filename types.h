@@ -28,6 +28,9 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+
+#define NULL ((void*) 0x00000000)
+
 typedef unsigned long long int uint64_t;
 typedef unsigned long int uint32_t;
 typedef unsigned short int uint16_t;
@@ -38,5 +41,9 @@ typedef signed long int int32_t;
 typedef signed short int int16_t;
 typedef signed char int8_t;
 
+typedef unsigned long int size_t;
+
+
+#define ASSERT(C0, C1) if(C0 != C1) exit(-1)
 
 #endif
