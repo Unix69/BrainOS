@@ -26,12 +26,12 @@
 
 #include "uart.h"
 #include "delays.h"
+#include "system_timer.h"
+#include "timer.h"
+#include "spi.h"
+
 
 #define BOOTMODE 64
-
-
-
-
 
 void exception_handler(unsigned long type, unsigned long esr, unsigned long elr, unsigned long spsr, unsigned long far, unsigned long currel);
 void print_uint64(uint64_t reg);
@@ -173,13 +173,82 @@ char OS_NAME [] = "BrainOS";
 char OS_LEVEL [] = "Root";
 char DIRECTORY [] = "/Home/Desktop";
 
+#define ROOT_ID 0
+
+
+
+void timer_err_handler(){
+	uart_puts("Timer error");
+}
+
+void timer_fiq_handler(){
+	uart_puts("Timer fiq");
+}
+
+void timer_irq_handler(){
+	uart_puts("Timer irq");
+}
+
+void timer_sync_handler(){
+	uart_puts("Timer synch");
+}
+
+
 void main()
 {
-                                 
-	uart_puts("\n\n\n--------------------------------------------------\n");
-	uart_puts("                Bootstap Brain OS               -\n");
-	uart_puts("--------------------------------------------------\n");
+    register uint32_t i;
+    register uint8_t t_owner = ROOT_ID;
+    register uint32_t t_load = 1024;
+
+	uart_puts("\n\n\n------------------------------------------------------------------\n");
+	uart_puts("                          Bootstap Brain OS                            -\n");
+	uart_puts("------------------------------------------------------------------------\n");
+
+	// Timer initialization function: MUST BE CALLED BEFORE EVERY OPERATION
+	//timer_boot();
+	//Acquire timer
+
+	timer_boot();
+	timer_init(1, 1, 0x0000ffff, 1, 1, 0, 0, 0);
+
+	uart_puts("\nTimer control ");
+	uart_hex_uint32(timer_ctrl_get());
+	uart_puts("\n");
+	uart_puts("Timer load ");
+	uart_hex_uint32(timer_load_get());
+	uart_puts("\n");
+	uart_puts("Timer value ");
+	uart_hex_uint32(timer_val_get());
+	uart_puts("\n");
+	uart_puts("Timer raw irq ");
+	uart_hex_uint32(timer_irq_raw_get());
+	uart_puts("\n");
+	uart_puts("Timer irq mask ");
+	uart_hex_uint32(timer_irq_mask_get());
+	uart_puts("\n");
+
+	uart_puts("System timer value ");
+	uart_hex_uint64(sys_timer_cnt_get());
+	uart_puts("\n");
+
+
+	spi_init(0, 0, 0, 3, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0);
 	
+	
+	/*spi_open(ROOT_ID);
+	spi_write(ROOT_ID, 12000);
+*/
+
+	
+
+
+
+
+	uart_puts("\n\n\n------------------------------------------------------------------\n");
+	uart_puts("                Bootstap Brain OS Successfully Completed                \n");
+	uart_puts("------------------------------------------------------------------------\n");
+	
+	/*
 	while(1){
 		char uart_input;
 		uart_puts("@");
@@ -194,11 +263,9 @@ void main()
 			uart_send(((unsigned int)uart_input) - 32);
 		}
 
-		
-		
 		uart_puts("\n");
 
 
-	}
+	}*/
 }
 
